@@ -97,6 +97,15 @@ def read_progress():
             db.set(DB_KEY_PROGRESS, {})
 
 
+def reset_progress():
+    global unlocked_answers
+
+    unlocked_answers = {}
+
+    with Database() as db:
+        db.set(DB_KEY_PROGRESS, {})
+
+
 def update_progress(key, answer):
     if answer is None:
         display_notice("Sorry, that's not a correct answer :'(")
@@ -232,14 +241,17 @@ def execute_next_command():
         if buttons.is_pressed(Buttons.BTN_A):
             return answer_current_question()
 
+        if buttons.is_pressed(Buttons.BTN_4) and buttons.is_pressed(Buttons.BTN_6):
+            return reset_progress()
+
         if buttons.is_pressed(Buttons.BTN_Menu) or buttons.is_pressed(Buttons.BTN_B):
             return quit_game()
 
         if buttons.is_pressed(Buttons.JOY_Up) or buttons.is_pressed(Buttons.JOY_Left):
-            return next_question()
+            return previous_question()
 
         if buttons.is_pressed(Buttons.JOY_Down) or buttons.is_pressed(Buttons.JOY_Right):
-            return previous_question()
+            return next_question()
 
 
 def answer_current_question():
@@ -254,7 +266,7 @@ def quit_game():
     app.restart_to_default()
 
 
-def previous_question():
+def next_question():
     global current_key
     if current_key == 10:
         current_key = 1
@@ -262,7 +274,7 @@ def previous_question():
         current_key += 1
 
 
-def next_question():
+def previous_question():
     global current_key
     if current_key == 1:
         current_key = 10
